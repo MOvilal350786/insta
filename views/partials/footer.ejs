@@ -5,12 +5,21 @@
         <a href="/upload"><i class="text-[1.4rem] ri-add-box-line"></i></a>
         <a href="/profile">
           <div class="w-8 h-8 bg-zinc-300 rounded-full overflow-hidden">
-            <img class="w-full h-full object-cover" src="/images/uploads/<%= user.picture %>" alt="">
+            <img class="w-full h-full object-cover" src="/images/uploads/<%= user.ProfileImage %>" alt="">
           </div>
         </a>
       </div>
-<% } %>
+<%}%>
 
+<script>
+  document.addEventListener("DOMContentLoaded", function(event) { 
+      var scrollpos = localStorage.getItem('scrollpos');
+      if (scrollpos) window.scrollTo(0, scrollpos);
+  });
 
+  window.onbeforeunload = function(e) {
+      localStorage.setItem('scrollpos', window.scrollY);
+  };
+</script>
 </body>
 </html>

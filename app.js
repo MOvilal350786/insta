@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var expressSession = require('express-session');
+var expressSession = require('express-session');//by it in server save the data of user or without it user don't reamin loggedIn 
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -15,13 +15,14 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-app.use(expressSession({
+app.use(expressSession({// if user once loggedIn then we can persists the data in whole process Or these four lines this allows to saving of data 
   resave: false,
   saveUninitialized: false,
   secret: "heyheyehhdd"
 }));
 app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.session());// by this line data save  or// is line ki wajah se data save hota hai 
+
 passport.serializeUser(usersRouter.serializeUser());
 passport.deserializeUser(usersRouter.deserializeUser());
 

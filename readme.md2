@@ -1,0 +1,538 @@
+all ejs page those are important
+
+.....................edit..........
+<% include ./partials/header.ejs %>
+
+<form hidden id="fileform" method="post" enctype="multipart/form-data" action="/upload">
+  <input id="file" type="file" name="image">
+</form>
+  
+<div class="w-full min-h-screen bg-zinc-900 text-white py-5">
+    <div class="flex justify-between items-center px-4">
+      <a class="text-sm text-blue-500" href="/profile"><i class="ri-arrow-left-s-line"></i> profile</a>
+      <h2 class="leading-none text-sm">Edit Profile</h2>
+      <a class="text-sm" href="/feed"><i class="ri-home-line"></i> home</a>
+    </div>
+    <div class="flex flex-col items-center gap-2 mt-20">
+      <div class="image w-20 h-20 bg-sky-100 rounded-full overflow-hidden">
+        <img class="w-full h-full object-cover" src="/images/uploads/<%= user.picture %>" alt="">
+      </div>
+      <button id="editbtn" class="text-blue-500 capitalize">edit picture</button>
+    </div>
+
+
+    <div class="gap-5 px-4 mt-10">
+      <h3 class="text-lg leading-none">Edit Account Details</h3>
+      <hr class="opacity-30 my-3">
+      <form class="w-full" action="/update" method="post" enctype="multipart/form-data">
+        <input class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900" type="text" placeholder="username" name="username" value="<%= user.username %>">
+        <input class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900" type="text" placeholder="name" name="name" value="<%= user.name %>">
+        <textarea class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900 resize-none" placeholder="Bio" name="bio"><%= user.bio %></textarea>
+        <input class="w-full bg-blue-500 px-3 py-3 rounded-md mt-2" type="submit" value="Update Details">
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.querySelector("#editbtn").addEventListener("click", function(){
+      document.querySelector("#file").click();
+    })
+
+    document.querySelector("#file")
+    .addEventListener("change", function(){
+      document.querySelector("#fileform").submit();
+    });
+  </script>
+<% include ./partials/footer.ejs %>
+
+
+...........................//Search........................................
+
+<% include ./partials/header.ejs %>
+    <div class="w-full min-h-screen bg-zinc-900 px-4 py-5">
+        <div class="border-2 border-zinc-800 flex items-center justify-between px-2 py-1 rounded-md">
+            <i class="text-white ri-search-line"></i>
+            <input class="input ml-1 w-full bg-zinc-900 outline-none text-zinc-400" type="text"
+                placeholder="search username">
+        </div>
+        <div class="users">
+
+        </div>
+    </div>
+
+    <script>
+        var inp = document.querySelector(".input")
+
+        inp.addEventListener("input", function (e) {
+            if (inp.value !== '') {
+                fetch(`/search/${inp.value}`)
+                    .then(raw => raw.json())
+                    .then(result => {
+                        let clutter = "";
+
+                        result.forEach((item) => {
+                            clutter += `<a href="/profile/${item.username}" class="outline-none">
+            <div class="text-white flex items-center gap-2 mt-5">
+                <div class="image w-[11vw] h-[11vw] rounded-full bg-sky-100 overflow-hidden">
+                    <img src="/images/uploads/${item.picture}" alt="">
+                    </div>
+                <div class="text">
+                    <h3>${item.username}</h3>
+                    <h4 class="text-xs opacity-30 leading-none">${item.name}</h4>
+                </div>
+            </div>            
+        </a>`
+                        })
+
+                        document.querySelector(".users")
+                            .innerHTML = clutter;
+                    });
+            }
+        })
+    </script>
+    <% include ./partials/footer.ejs %>
+
+
+    .....................upload....................
+
+    <% include ./partials/header.ejs %>
+  <div class="w-full min-h-screen bg-zinc-900 text-white py-5">
+    <div class="flex justify-between items-center px-4">
+      <a class="text-sm text-blue-500" href="/profile"><i class="ri-arrow-left-s-line"></i> profile</a>
+      <h2 class="leading-none text-sm">Upload Post</h2>
+      <a class="text-sm" href="/feed"><i class="ri-home-line"></i> home</a>
+    </div>
+    <div class="flex flex-col items-center gap-2 mt-20">
+      <div class="image w-[25vw] h-[25vw] rounded-full border-2 border-zinc-800 flex items-center justify-center">
+        <i class="text-5xl font-light ri-image-line"></i>
+      </div>
+      <button id="selectpic" class="text-blue-500 capitalize">select picture</button>
+    </div>
+    <div class="flex w-full justify-center items-center mt-10 gap-3">
+      <h5 class="post opacity-100 border-b-[1px] p-2 border-zinc-400">post</h5>
+      <h5 class="story opacity-20 border-b-[1px] p-2 border-zinc-900">story</h5>
+    </div>
+    <form id="uploadform" action="/post" class="w-full px-6 py-3 mt-10" enctype="multipart/form-data" method="post">
+        <input class="postinput" hidden name="category" type="radio" value="post" checked="true">
+        <input class="storyinput" hidden name="category" type="radio" value="story">
+        <input id="imageinp" hidden type="file" name="image">
+        <textarea name="caption" class="px-2 py-1 w-full bg-zinc-900 border-2 h-20 border-zinc-800 resize-none rounded-md outline-none" placeholder="Write a caption..."></textarea>
+        <input class="w-full px-2 py-2 bg-blue-500 rounded-md" type="submit" value="Post">
+    </form>
+  </div>
+
+  <script>
+    document.querySelector("#selectpic")
+    .addEventListener("click", function(){
+        document.querySelector("#uploadform #imageinp").click();
+    });
+
+    document.querySelector(".post")
+    .addEventListener("click", function(){
+      this.style.opacity = 1;
+      this.style.borderColor = "rgb(161,161,170)";
+
+      document.querySelector(".story").style.opacity = .2;
+      document.querySelector(".story").style.borderColor = "#18181B";
+      
+      document.querySelector(".postinput").setAttribute("checked", true);
+      document.querySelector(".storyinput").removeAttribute("checked");
+    })
+
+    document.querySelector(".story")
+    .addEventListener("click", function(){
+      this.style.opacity = 1;
+      this.style.borderColor = "rgb(161,161,170)";
+
+      document.querySelector(".post").style.opacity = .2;
+      document.querySelector(".post").style.borderColor = "#18181B";
+
+      document.querySelector(".postinput").removeAttribute("checked");
+      document.querySelector(".storyinput").setAttribute("checked", true);
+    })
+  </script>
+<% include ./partials/footer.ejs %>
+
+.............................userprofile.......................
+
+<% include ./partials/header.ejs %>
+  <div class="w-full min-h-screen bg-zinc-900 text-white py-5">
+      <div class="nav flex justify-between items-center px-4">
+        <h3 class="text-lg"><%= userprofile.username %></h3>
+        <div class="icons flex gap-5">
+          <a href="/upload"><i class="text-[1.4rem] ri-add-box-line"></i></a>
+          <i class="text-[1.4rem] ri-menu-line"></i>
+        </div>
+      </div>
+      <div class="flex justify-between items-center pl-6 pr-[12vw] mt-8">
+        <div class="w-[19vw] h-[19vw] bg-sky-100 rounded-full overflow-hidden">
+          <img class="w-full h-full object-cover" src="/images/uploads/<%= userprofile.picture %>" alt="">
+        </div>
+        <div class="stats flex gap-5 items-center justify-between">
+          <div class="flex flex-col items-center justify-center">
+            <h3 class="text-lg"><%= userprofile.posts.length %></h3>
+            <h4>Posts</h4>
+          </div>
+          <div class="flex flex-col items-center justify-center">
+            <h3 class="text-lg"><%= userprofile.followers.length %></h3>
+            <h4>Followers</h4>
+          </div>
+          <div class="flex flex-col items-center justify-center">
+            <h3 class="text-lg"><%= userprofile.following.length %></h3>
+            <h4>Following</h4>
+          </div>
+        </div>
+      </div>
+      <div class="dets px-6 mt-5">
+        <h3 class="text-lg mb-1"><%= userprofile.name %></h3>
+        <p class="text-xs tracking-tight opacity-50"><%= userprofile.bio ?? "You have not set anything yet, (click edit profile to set)" %></p>
+      </div>
+      <div class="px-6 mt-5 flex gap-1">
+        <% if(user.following.indexOf(userprofile._id) === -1){ %>
+            <a class="px-6 py-2 bg-blue-500 text-xs rounded-md" href="/follow/<%= userprofile._id %>">Follow</a>
+        <% } else { %>
+            <a class="px-6 py-2 bg-zinc-800 text-xs rounded-md" href="/follow/<%= userprofile._id %>">Following</a>
+        <% } %>
+        <a class="px-6 py-2 bg-zinc-800 text-xs rounded-md" href="/edit">Message</a>
+        <a class="px-6 py-2 bg-zinc-800 text-xs rounded-md" href="/edit">Contact</a>
+      </div>
+      <div class="posts w-full flex gap-1 py-2 mt-5 flex-wrap">
+        <% if(userprofile.posts.length>0){ %>
+          <% userprofile.posts.reverse().forEach(function(post){ %>
+            <div class="post w-[32.5%] h-32 bg-sky-100">
+              <img class="w-full h-full object-cover" src="/images/uploads/<%= post.picture %>" alt="">
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="w-full flex justify-center items-center min-h-[20vh]">
+            <small class="opacity-50">no posts yet.</small>
+          </div>
+        <% } %>
+      </div>
+  </div>
+<% include ./partials/footer.ejs %>
+
+............................feed........................
+<% include ./partials/header.ejs %>
+  <div class="w-full min-h-screen bg-zinc-900 text-white py-5">
+  
+    <div class="w-full px-4 flex items-center justify-between">
+      <img class="w-1/4" src="/images/logo.png" alt="">
+      <div class="icons -mt-2 flex gap-5 items-center">
+        <i class="text-[1.4rem] ri-heart-3-line"></i>
+        <i class="text-[1.4rem] ri-messenger-line"></i>
+      </div>
+    </div>
+
+
+    <div class="story px-3 flex gap-3 overflow-auto mt-5">
+      <a href="/story">
+        <div class="circle flex-shrink-0">
+          <div
+            class="gradient w-[18vw] h-[18vw] bg-sky-100 rounded-full bg-gradient-to-r from-purple-700 to-orange-500 flex items-center justify-center">
+            <div class="inner w-[92%] h-[92%] rounded-full overflow-hidden">
+              <img class="w-full h-full object-cover" src="/images/uploads/<%= user.picture %>" alt="">
+            </div>
+          </div>
+        </div>
+      </a>
+      <% stories.forEach(function(story){ %>
+        <a href="/story/<%= story.id %>">
+          <div class="circle flex-shrink-0">
+            <div
+              class="gradient w-[18vw] h-[18vw] bg-sky-100 rounded-full bg-gradient-to-r from-purple-700 to-orange-500 flex items-center justify-center">
+              <div class="inner w-[92%] h-[92%] rounded-full overflow-hidden">
+                <img class="w-full h-full object-cover" src="/images/uploads/<%= user.picture %>" alt="">
+              </div>
+            </div>
+          </div>
+        </a>
+        <% }) %>
+    </div>
+
+    
+    <div class="posts parent mb-20">
+      <% posts.reverse().forEach(function(post){ %>
+        <div class="post mt-10 w-full min-h-[50vh]">
+          <div class="title px-4 flex items-center gap-2">
+            <div class="w-[9vw] h-[9vw] bg-sky-100 rounded-full overflow-hidden">
+              <img class="w-full h-full object-cover" src="/images/uploads/<%= post.user.picture %>" alt="">
+            </div>
+            <h4 class="text-sm">
+              <%= post.user.username %>
+            </h4>
+            <h6 class="text-xs opacity-30">
+              <%= dater(new Date(post.date)) %>
+            </h6>
+          </div>
+          <div class="relative w-full h-96 mt-4 bg-sky-100 overflow-hidden">
+            <img data-postid="<%= post.id %>" class="postimg w-full h-full object-cover"
+              src="/images/uploads/<%= post.picture %>" alt="">
+          </div>
+          <div class="options w-full px-4 flex justify-between items-center text-[1.4rem]">
+            <div class="flex gap-3 mt-2">
+              <% if(post.like.indexOf(user._id)===-1){ %>
+                <i class="heart ri-heart-3-line"></i>
+                <% } else { %>
+                  <i class="heart ri-heart-3-fill text-red-500"></i>
+                  <% } %>
+                    <i class="ri-chat-3-line"></i>
+                    <i class="ri-share-circle-line"></i>
+            </div>
+            <% if(user.saved.indexOf(post.id)===-1){ %>
+              <i data-postid="<%= post.id %>" class="save ri-bookmark-line"></i>
+              <% } else { %>
+                <i data-postid="<%= post.id %>" class="save ri-bookmark-fill text-zinc-100"></i>
+                <% } %>
+          </div>
+          <h3 class="likeval px-4 mt-2 text-sm leading-none tracking-tight">
+            <%= post.like.length %> likes
+          </h3>
+          <h2 class="text-white font-light text-sm mt-2">
+            <span class="font-semibold pl-4 pr-2">
+              <%= post.user.username %>
+            </span>
+            <%= post.caption %>
+          </h2>
+        </div>
+        <% }) %>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+    integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    function formatRelativeTime(date) {
+      const now = new Date();
+      const diff = now - date;
+
+      // Convert milliseconds to seconds
+      const seconds = Math.floor(diff / 1000);
+
+      if (seconds < 60) {
+        return `${seconds}s`;
+      }
+
+      const minutes = Math.floor(seconds / 60);
+
+      if (minutes < 60) {
+        return `${minutes}m`;
+      }
+
+      const hours = Math.floor(minutes / 60);
+
+      if (hours < 24) {
+        return `${hours}h`;
+      }
+
+      const days = Math.floor(hours / 24);
+
+      if (days < 7) {
+        return `${days}d`;
+      }
+
+      const weeks = Math.floor(days / 7);
+
+      return `${weeks}w`;
+    }
+
+    document.querySelector(".parent")
+      .addEventListener("click", function (dets) {
+        if (dets.target.classList.contains("postimg")) {
+          var post = dets.target.parentNode.parentNode;
+          var heartwithborder = post.querySelector(".heart");
+          if (heartwithborder.classList.contains("ri-heart-3-line")) {
+            heartwithborder.classList.remove("ri-heart-3-line")
+            heartwithborder.classList.add("ri-heart-3-fill")
+            heartwithborder.classList.add("text-red-500")
+            // heartwithborder.style.color = "red";
+          }
+          else {
+            heartwithborder.classList.remove("ri-heart-3-fill")
+            heartwithborder.classList.remove("text-red-500")
+            heartwithborder.classList.add("ri-heart-3-line")
+          }
+          fetch(`/like/${dets.target.dataset.postid}`)
+            .then(raw => raw.json())
+            .then(response => {
+              console.log(response.like.length);
+              post.querySelector(".likeval").textContent = response.like.length + " likes"
+            })
+
+          var icon = document.createElement("i");
+          icon.classList.add("ri-heart-3-fill");
+          icon.classList.add("text-red-700", "text-6xl", 'absolute', 'top-1/2', 'left-1/2', '-translate-x-[50%]', '-translate-y-[50%]', 'z-[9]');
+          dets.target.parentNode.appendChild(icon);
+
+          gsap.from(icon, {
+            scale: .5,
+            y: 30,
+            opacity: 0,
+            ease: Expo,
+            duration: .3
+          })
+
+          gsap.to(icon, {
+            scale: 0,
+            y: -30,
+            opacity: 0,
+            duration: .3,
+            ease: Expo,
+            delay: .3,
+            onComplete: () => {
+              dets.target.parentNode.removeChild(icon);
+            }
+          })
+        }
+        else if (dets.target.classList.contains("save")) {
+          var id = dets.target.dataset.postid;
+          fetch(`/save/${id}`)
+            .then(raw => raw.json())
+            .then(result => {
+              if (!dets.target.classList.contains("ri-bookmark-line")) {
+                dets.target.classList.remove("ri-bookmark-fill", "text-zinc-100");
+                dets.target.classList.add("ri-bookmark-line")
+              }
+              else {
+                dets.target.classList.remove("ri-bookmark-line")
+                dets.target.classList.add("ri-bookmark-fill", "text-zinc-100")
+              }
+            })
+        }
+      })
+  </script>
+
+
+  <% include ./partials/footer.ejs %>
+
+
+  ..........................index...............
+  <% include ./partials/header.ejs %>
+  <div class="w-full min-h-screen bg-zinc-900 text-white py-5 flex flex-col items-center justify-center">
+    <div class="flex flex-col items-center gap-5 px-4">
+      <img class="w-1/2" src="/images/logo.png" alt="">
+      <form class="w-full" action="/register" method="post">
+        <input class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900" type="text" placeholder="username" name="username">
+        <input class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900" type="email" placeholder="email" name="email">
+        <input class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900" type="text" placeholder="name" name="name">
+        <input class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900" type="password" placeholder="password" name="password">
+        <input class="w-full bg-blue-500 px-3 py-3 rounded-md mt-2" type="submit" value="Make New Account">
+      </form>
+      <span>Already have an account ? <a href="/login" class="text-blue-500">Log In</a></span>
+    </div>
+  </div>
+<% include ./partials/footer.ejs %>
+
+.....................................login.....................
+<% include ./partials/header.ejs %>
+  <div class="w-full min-h-screen bg-zinc-900 text-white py-5 flex flex-col items-center justify-center">
+    <div class="flex flex-col items-center gap-5 px-4">
+      <img class="w-1/2" src="/images/logo.png" alt="">
+      <form class="w-full" action="/login" method="post">
+        <input class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900" type="text" placeholder="username" name="username">
+        <input class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900" type="password" placeholder="password" name="password">
+        <input class="w-full bg-blue-500 px-3 py-3 rounded-md mt-2" type="submit" value="Log In">
+      </form>
+      <span>Don't have an account ? <a href="/" class="text-blue-500">Sign Up</a></span>
+    </div>
+  </div>
+<% include ./partials/footer.ejs %>
+
+
+...............................profile..................
+
+<% include ./partials/header.ejs %>
+  <div class="w-full min-h-screen bg-zinc-900 text-white py-5">
+
+      <div class="nav flex justify-between items-center px-4">
+        <h3 class="text-lg"><%= user.username %></h3>
+        <div class="icons flex gap-5">
+          <a href="/upload"><i class="text-[1.4rem] ri-add-box-line"></i></a>
+          <i class="text-[1.4rem] ri-menu-line"></i>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pl-6 pr-[12vw] mt-8">
+        <div class="w-[19vw] h-[19vw] bg-sky-100 rounded-full overflow-hidden">
+          <img class="w-full h-full object-cover" src="/images/uploads/<%= user.picture %>" alt="">
+        </div>
+        <div class="stats flex gap-5 items-center justify-between">
+          <div class="flex flex-col items-center justify-center">
+            <h3><%= user.posts.length %></h3>
+            <h4>Posts</h4>
+          </div>
+          <div class="flex flex-col items-center justify-center">
+            <h3><%= user.followers.length %></h3>
+            <h4>Followers</h4>
+          </div>
+          <div class="flex flex-col items-center justify-center">
+            <h3><%= user.following.length %></h3>
+            <h4>Following</h4>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="dets px-6 mt-5">
+        <h3 class="text-lg mb-1"><%= user.name %></h3>
+        <p class="text-xs tracking-tight opacity-50"><%= user.bio ?? "You have not set anything yet, (click edit profile to set)" %></p>
+      </div>
+
+      <div class="px-6 mt-5">
+        <a class="px-3 py-2 bg-zinc-800 text-xs rounded-md" href="/edit">Edit Profile</a>
+      </div>
+      
+      <div class="posts w-full flex gap-1 py-2 mt-5 flex-wrap">
+        <% if(user.posts.length>0){ %>
+          <% user.posts.reverse().forEach(function(post){ %>
+            <div class="post w-[32.5%] h-32 bg-sky-100">
+              <img class="w-full h-full object-cover" src="/images/uploads/<%= post.picture %>" alt="">
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="w-full flex justify-center items-center min-h-[20vh]">
+            <small class="opacity-50">no posts yet.</small>
+          </div>
+        <% } %>
+      </div>
+  </div>
+<% include ./partials/footer.ejs %>
+
+
+.................footer..............
+
+<% if(footer){ %>
+    <div class="footer text-white flex justify-between items-center w-full fixed bottom-0 z-[10] bg-zinc-900 px-10 py-3">
+        <a href="/feed"><i class="text-[1.4rem] ri-home-line"></i></a>
+        <a href="/search"><i class="text-[1.4rem] ri-search-line"></i></a>
+        <a href="/upload"><i class="text-[1.4rem] ri-add-box-line"></i></a>
+        <a href="/profile">
+          <div class="w-8 h-8 bg-zinc-300 rounded-full overflow-hidden">
+            <img class="w-full h-full object-cover" src="/images/uploads/<%= user.picture %>" alt="">
+          </div>
+        </a>
+      </div>
+<%}%>
+
+
+</body>
+</html>
+
+
+....................................multer
+const multer = require("multer");
+const {v4:uuid}=require('uuid');
+const path = require("path");
+
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./public/images/uploads");
+  },
+  filename: function (req, file, cb) {
+  const unique=uuidv4();
+  cb(null, unique+path.extname(file.originalname));
+  }
+});
+module.exports = multer({ storage: storage });
